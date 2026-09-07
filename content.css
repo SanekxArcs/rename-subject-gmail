@@ -1,0 +1,458 @@
+/* ─────────────────────────────────────────────
+   Gmail Subject Renamer – injected styles
+───────────────────────────────────────────── */
+
+/* ── Rename button – shared base ── */
+.gsrn-rename-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  font-size: 13px;
+  line-height: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    opacity 0.12s,
+    border-color 0.12s,
+    background 0.12s;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ── Button inside open-thread (next to h2.hP) ── */
+#gsrn-thread-btn {
+  margin-left: 8px;
+  opacity: 0.5;
+  position: relative;
+  top: -2px;
+}
+
+#gsrn-thread-btn:hover,
+#gsrn-thread-btn:focus-visible {
+  opacity: 1;
+  border-color: #dadce0;
+  background: #f1f3f4;
+  outline: none;
+}
+
+/* ── Button inside list rows (span.bog sibling) ── */
+/* Hidden by default; shown on row hover */
+tr.zA .gsrn-rename-btn {
+  opacity: 0;
+  margin-left: 5px;
+  font-size: 11px;
+  padding: 1px 3px;
+  pointer-events: none;
+}
+
+tr.zA:hover .gsrn-rename-btn,
+tr.zA:focus-within .gsrn-rename-btn {
+  opacity: 0.7;
+  pointer-events: auto;
+}
+
+tr.zA .gsrn-rename-btn:hover,
+tr.zA .gsrn-rename-btn:focus-visible {
+  opacity: 1;
+  border-color: #dadce0;
+  background: rgba(0, 0, 0, 0.06);
+  outline: none;
+}
+
+/* Hide the hover pen when the row already has a renamed subject.
+   The renamed span itself is clickable for re-editing (see content.js). */
+tr.zA:has(span[data-gsrn-applied="1"]) .gsrn-rename-btn {
+  display: none !important;
+}
+
+/* ── Visual indicator on renamed subjects ── */
+span[data-gsrn-applied="1"],
+h2[data-gsrn-applied="1"] {
+  text-decoration: underline dotted rgba(0,0,0,0.25);
+}
+
+/* Renamed list-row subject: looks and behaves as a clickable edit trigger */
+span[data-gsrn-applied="1"] {
+  cursor: pointer;
+}
+
+span[data-gsrn-applied="1"]:hover {
+  text-decoration: underline rgba(0,0,0,0.5);
+}
+
+/* ── Overlay backdrop ── */
+#gsrn-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  animation: gsrn-fade-in 0.12s ease;
+}
+
+@keyframes gsrn-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Modal box ── */
+.gsrn-modal-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+  padding: 28px 32px 24px;
+  width: min(500px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: gsrn-slide-up 0.15s ease;
+}
+
+@keyframes gsrn-slide-up {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.gsrn-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+}
+
+.gsrn-modal-hint {
+  margin: 0;
+  font-size: 13px;
+  color: #5f6368;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.gsrn-modal-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #3c4043;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+.gsrn-modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: Roboto, Arial, sans-serif;
+  border: 1.5px solid #dadce0;
+  border-radius: 6px;
+  outline: none;
+  color: #202124;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.gsrn-modal-input:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.gsrn-services-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gsrn-services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gsrn-service-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f1f3f4;
+  border: 1px solid #dadce0;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.gsrn-service-chip:has(input:checked) {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+  color: #1967d2;
+}
+
+.gsrn-service-chip input {
+  display: none;
+}
+
+.gsrn-typography-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gsrn-type-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gsrn-toggle-group {
+  display: flex;
+  border: 1.5px solid #dadce0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.gsrn-toggle-btn {
+  padding: 5px 14px;
+  font-size: 13px;
+  font-family: Roboto, Arial, sans-serif;
+  background: #fff;
+  border: none;
+  border-right: 1.5px solid #dadce0;
+  cursor: pointer;
+  color: #3c4043;
+  transition: background 0.12s, color 0.12s;
+  line-height: 1.4;
+}
+
+.gsrn-toggle-btn:last-child {
+  border-right: none;
+}
+
+.gsrn-toggle-btn:hover {
+  background: #f1f3f4;
+}
+
+.gsrn-toggle-btn.gsrn-toggle-active {
+  background: #e8f0fe;
+  color: #1967d2;
+}
+
+.gsrn-color-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f3f4;
+}
+
+.gsrn-color-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#gsrn-color-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: opacity 0.2s;
+}
+
+#gsrn-color-picker-container.gsrn-disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.gsrn-color-picker-main {
+  display: flex;
+  gap: 12px;
+  height: 150px;
+}
+
+.gsrn-color-area {
+  position: relative;
+  flex: 1;
+  background-color: red;
+  border-radius: 4px;
+  cursor: crosshair;
+  overflow: hidden;
+}
+
+.gsrn-color-area-white {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+}
+
+.gsrn-color-area-black {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+}
+
+.gsrn-color-cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.gsrn-hue-slider {
+  position: relative;
+  width: 24px;
+  background: linear-gradient(
+    to bottom,
+    #f00 0%,
+    #ff0 17%,
+    #0f0 33%,
+    #0ff 50%,
+    #00f 67%,
+    #f0f 83%,
+    #f00 100%
+  );
+  border-radius: 4px;
+  cursor: ns-resize;
+}
+
+.gsrn-hue-cursor {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  height: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.gsrn-color-presets {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gsrn-presets-label {
+  font-size: 11px;
+  color: #5f6368;
+  width: 45px;
+  flex-shrink: 0;
+}
+
+.gsrn-presets-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gsrn-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.gsrn-color-swatch:hover {
+  transform: scale(1.2);
+}
+
+.gsrn-color-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.gsrn-color-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #1a73e8;
+}
+
+.gsrn-color-preview {
+  font-size: 13px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    color 0.15s,
+    opacity 0.15s;
+}
+
+/* ── Action buttons ── */
+.gsrn-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.gsrn-btn {
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    box-shadow 0.12s;
+}
+
+.gsrn-btn-primary {
+  background: #1a73e8;
+  color: #fff;
+}
+.gsrn-btn-primary:hover {
+  background: #1558b0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.gsrn-btn-secondary {
+  background: #f1f3f4;
+  color: #3c4043;
+}
+.gsrn-btn-secondary:hover {
+  background: #e8eaed;
+}
+
+.gsrn-btn-ghost {
+  background: transparent;
+  color: #5f6368;
+}
+.gsrn-btn-ghost:hover {
+  background: #f1f3f4;
+}
