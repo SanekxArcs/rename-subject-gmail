@@ -85,6 +85,15 @@ span[data-gsrn-applied="1"]:hover {
 
 /* ── Overlay backdrop ── */
 #gsrn-modal {
+  --gsrn-background: #ffffff;
+  --gsrn-foreground: #18181b;
+  --gsrn-muted: #71717a;
+  --gsrn-border: #e4e4e7;
+  --gsrn-surface: #f4f4f5;
+  --gsrn-primary: #18181b;
+  --gsrn-primary-text: #fafafa;
+  color: var(--gsrn-foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -106,11 +115,15 @@ span[data-gsrn-applied="1"]:hover {
 
 /* ── Modal box ── */
 .gsrn-modal-box {
-  background: #fff;
+  background: var(--gsrn-background);
+  border: 1px solid var(--gsrn-border);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
   padding: 28px 32px 24px;
   width: min(500px, 90vw);
+  box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -132,22 +145,23 @@ span[data-gsrn-applied="1"]:hover {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #202124;
-  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  color: var(--gsrn-foreground);
+  font-family: inherit;
+  letter-spacing: -0.4px;
 }
 
 .gsrn-modal-hint {
   margin: 0;
   font-size: 13px;
-  color: #5f6368;
-  font-family: Roboto, Arial, sans-serif;
+  color: var(--gsrn-muted);
+  font-family: inherit;
 }
 
 .gsrn-modal-label {
   font-size: 13px;
   font-weight: 500;
-  color: #3c4043;
-  font-family: Roboto, Arial, sans-serif;
+  color: var(--gsrn-foreground);
+  font-family: inherit;
 }
 
 .gsrn-modal-input {
@@ -155,19 +169,20 @@ span[data-gsrn-applied="1"]:hover {
   box-sizing: border-box;
   padding: 10px 12px;
   font-size: 15px;
-  font-family: Roboto, Arial, sans-serif;
-  border: 1.5px solid #dadce0;
+  font-family: inherit;
+  background: var(--gsrn-background);
+  border: 1px solid var(--gsrn-border);
   border-radius: 6px;
   outline: none;
-  color: #202124;
+  color: var(--gsrn-foreground);
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
 }
 
 .gsrn-modal-input:focus {
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  border-color: #a1a1aa;
+  box-shadow: 0 0 0 3px #a1a1aa33;
 }
 
 .gsrn-services-section {
@@ -187,9 +202,9 @@ span[data-gsrn-applied="1"]:hover {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: #f1f3f4;
-  border: 1px solid #dadce0;
-  border-radius: 16px;
+  background: var(--gsrn-background);
+  border: 1px solid var(--gsrn-border);
+  border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
   user-select: none;
@@ -199,13 +214,16 @@ span[data-gsrn-applied="1"]:hover {
 }
 
 .gsrn-service-chip:has(input:checked) {
-  background: #e8f0fe;
-  border-color: #1a73e8;
-  color: #1967d2;
+  background: var(--gsrn-primary);
+  border-color: var(--gsrn-primary);
+  color: var(--gsrn-primary-text);
 }
 
 .gsrn-service-chip input {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 .gsrn-typography-section {
@@ -222,7 +240,7 @@ span[data-gsrn-applied="1"]:hover {
 
 .gsrn-toggle-group {
   display: flex;
-  border: 1.5px solid #dadce0;
+  border: 1px solid var(--gsrn-border);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -230,12 +248,12 @@ span[data-gsrn-applied="1"]:hover {
 .gsrn-toggle-btn {
   padding: 5px 14px;
   font-size: 13px;
-  font-family: Roboto, Arial, sans-serif;
-  background: #fff;
+  font-family: inherit;
+  background: var(--gsrn-background);
   border: none;
-  border-right: 1.5px solid #dadce0;
+  border-right: 1px solid var(--gsrn-border);
   cursor: pointer;
-  color: #3c4043;
+  color: var(--gsrn-foreground);
   transition: background 0.12s, color 0.12s;
   line-height: 1.4;
 }
@@ -245,12 +263,12 @@ span[data-gsrn-applied="1"]:hover {
 }
 
 .gsrn-toggle-btn:hover {
-  background: #f1f3f4;
+  background: var(--gsrn-surface);
 }
 
 .gsrn-toggle-btn.gsrn-toggle-active {
-  background: #e8f0fe;
-  color: #1967d2;
+  background: var(--gsrn-primary);
+  color: var(--gsrn-primary-text);
 }
 
 .gsrn-color-section {
@@ -258,7 +276,7 @@ span[data-gsrn-applied="1"]:hover {
   flex-direction: column;
   gap: 12px;
   padding-top: 8px;
-  border-top: 1px solid #f1f3f4;
+  border-top: 1px solid var(--gsrn-border);
 }
 
 .gsrn-color-header {
@@ -356,7 +374,7 @@ span[data-gsrn-applied="1"]:hover {
 
 .gsrn-presets-label {
   font-size: 11px;
-  color: #5f6368;
+  color: var(--gsrn-muted);
   width: 45px;
   flex-shrink: 0;
 }
@@ -386,7 +404,7 @@ span[data-gsrn-applied="1"]:hover {
   gap: 6px;
   font-size: 13px;
   font-weight: 500;
-  color: #3c4043;
+  color: var(--gsrn-foreground);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
@@ -396,7 +414,7 @@ span[data-gsrn-applied="1"]:hover {
   width: 14px;
   height: 14px;
   cursor: pointer;
-  accent-color: #1a73e8;
+  accent-color: var(--gsrn-primary);
 }
 
 .gsrn-color-preview {
@@ -423,8 +441,8 @@ span[data-gsrn-applied="1"]:hover {
   padding: 8px 18px;
   font-size: 14px;
   font-weight: 500;
-  font-family: "Google Sans", Roboto, Arial, sans-serif;
-  border: none;
+  font-family: inherit;
+  border: 1px solid transparent;
   border-radius: 6px;
   cursor: pointer;
   transition:
@@ -433,26 +451,51 @@ span[data-gsrn-applied="1"]:hover {
 }
 
 .gsrn-btn-primary {
-  background: #1a73e8;
-  color: #fff;
+  background: var(--gsrn-primary);
+  color: var(--gsrn-primary-text);
 }
 .gsrn-btn-primary:hover {
-  background: #1558b0;
+  opacity: 0.85;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
 }
 
 .gsrn-btn-secondary {
-  background: #f1f3f4;
-  color: #3c4043;
+  background: var(--gsrn-background);
+  color: var(--gsrn-foreground);
+  border-color: var(--gsrn-border);
 }
 .gsrn-btn-secondary:hover {
-  background: #e8eaed;
+  background: var(--gsrn-surface);
 }
 
 .gsrn-btn-ghost {
   background: transparent;
-  color: #5f6368;
+  color: var(--gsrn-muted);
 }
 .gsrn-btn-ghost:hover {
-  background: #f1f3f4;
+  background: var(--gsrn-surface);
+}
+
+#gsrn-modal button:focus-visible,
+.gsrn-service-chip:focus-within,
+.gsrn-rename-btn:focus-visible {
+  outline: 2px solid #a1a1aa;
+  outline-offset: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #gsrn-modal {
+    --gsrn-background: #09090b;
+    --gsrn-foreground: #fafafa;
+    --gsrn-muted: #a1a1aa;
+    --gsrn-border: #27272a;
+    --gsrn-surface: #18181b;
+    --gsrn-primary: #fafafa;
+    --gsrn-primary-text: #18181b;
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #gsrn-modal, #gsrn-modal *, .gsrn-rename-btn { animation: none !important; transition: none !important; }
 }

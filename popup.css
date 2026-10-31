@@ -1,0 +1,64 @@
+:root {
+  color-scheme: light dark;
+  --background: #ffffff;
+  --foreground: #18181b;
+  --muted: #71717a;
+  --surface: #fafafa;
+  --border: #e4e4e7;
+  --primary: #18181b;
+  --primary-text: #fafafa;
+  --ring: #a1a1aa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+}
+* { box-sizing: border-box; }
+body { width: 360px; margin: 0; background: var(--background); color: var(--foreground); }
+main { padding: 22px; }
+a { color: inherit; text-decoration: none; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+h1, h2, p { margin: 0; }
+p { color: var(--muted); line-height: 1.6; }
+.header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+.brand { flex: 1; }
+h1 { font-size: 15px; font-weight: 650; letter-spacing: -.4px; }
+.brand p { font-size: 11px; margin-top: 3px; }
+.version { color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 3px 5px; font-size: 10px; }
+.control-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.control-row { padding: 17px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+h2 { font-size: 12px; font-weight: 600; }
+.control-row p { margin-top: 4px; font-size: 11px; }
+.switch { flex: none; width: 38px; height: 22px; padding: 3px; border: 0; border-radius: 999px; background: var(--border); cursor: pointer; transition: background .15s; }
+.switch span { display: block; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0002; transition: transform .15s; }
+.switch[aria-checked="true"] { background: var(--primary); }
+.switch[aria-checked="true"] span { transform: translateX(16px); }
+.switch:disabled { cursor: wait; opacity: .5; }
+.status-row { display: flex; align-items: center; gap: 7px; padding: 10px 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 11px; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex: none; }
+.status-dot.active { background: #16a34a; box-shadow: 0 0 0 3px #16a34a15; }
+.summary { display: flex; align-items: center; gap: 10px; padding: 19px 0; border-bottom: 1px solid var(--border); }
+.summary-icon { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 8px; font-size: 20px; }
+.summary strong { font-size: 14px; font-weight: 600; }
+.summary p { font-size: 10px; margin-top: 2px; }
+.local-badge { margin-left: auto; border: 1px solid var(--border); border-radius: 5px; padding: 3px 6px; font-size: 9px; color: var(--muted); }
+.guide { padding: 21px 0 20px; }
+.guide > p { margin-top: 7px; font-size: 11px; }
+.primary-button { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 10px; background: var(--primary); color: var(--primary-text); border: 1px solid var(--primary); border-radius: 7px; font-weight: 500; transition: opacity .15s; }
+.primary-button:hover { opacity: .86; }
+.guide .privacy-note { text-align: center; font-size: 9px; margin-top: 10px; }
+footer { border-top: 1px solid var(--border); padding-top: 16px; }
+.author { display: flex; align-items: center; gap: 9px; }
+.avatar { display: grid; place-items: center; width: 30px; height: 30px; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; font-size: 10px; font-weight: 600; }
+.eyebrow { display: block; color: var(--muted); font-size: 9px; margin-bottom: 2px; }
+.author a { font-size: 11px; font-weight: 500; }
+.social-links { display: flex; gap: 8px; margin-top: 14px; }
+.social-links a { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border: 1px solid var(--border); border-radius: 7px; font-size: 11px; transition: background .15s; }
+.social-links a:hover { background: var(--surface); }
+.social-links svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-color-scheme: dark) {
+  :root { --background: #09090b; --foreground: #fafafa; --muted: #a1a1aa; --surface: #121215; --border: #27272a; --primary: #fafafa; --primary-text: #18181b; }
+  .switch[aria-checked="true"] span { background: #18181b; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}

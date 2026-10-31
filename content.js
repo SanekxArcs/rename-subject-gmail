@@ -16,6 +16,8 @@
 /* ─── Constants ─────────────────────────────────────────────── */
 const STORAGE_KEY_PREFIX = 'gsrn_';
 const RECENT_COLORS_KEY = 'gsrn_recent_colors';
+const ENABLED_KEY = 'gsrn_enabled';
+let extensionEnabled = false;
 const MODAL_ID = 'gsrn-modal';
 const ORIGINAL_ATTR = 'data-gsrn-original';
 
@@ -116,7 +118,7 @@ function allRenames(cb) {
   safeGet(null, (items) => {
     const map = {};
     for (const [k, v] of Object.entries(items || {}))
-      if (k.startsWith(STORAGE_KEY_PREFIX)) map[k.slice(STORAGE_KEY_PREFIX.length)] = v;
+      if (k.startsWith(STORAGE_KEY_PREFIX) && k !== ENABLED_KEY && k !== RECENT_COLORS_KEY) map[k.slice(STORAGE_KEY_PREFIX.length)] = v;
     cb(map);
   });
 }
@@ -180,7 +182,14 @@ function restoreText(el) {
 
 /* ─── Modal dialog ───────────────────────────────────────────── */
 
-const closeModal = () => { document.getElementById(MODAL_ID)?.remove(); };
+let modalTrigger = null;
+const closeModal = () => {
+  const overlay = document.getElementById(MODAL_ID);
+  if (!overlay) return;
+  overlay.remove();
+  if (modalTrigger?.isConnected) modalTrigger.focus();
+  modalTrigger = null;
+};
 
 function hsvToRgb(h, s, v) {
   let r, g, b;
@@ -225,7 +234,9 @@ function rgbToHsv(color) {
 
 // current = { text: string, color: string, services: string[], fontWeight: string, fontStyle: string }
 function openModal(tid, current, onSave) {
+  if (!extensionEnabled) return;
   closeModal();
+  modalTrigger = document.activeElement;
   const hasColor  = !!(current && current.color);
   const initColor = normalizeToHex(hasColor ? current.color : '#1a73e8');
   const selectedServices = current ? (current.services || []) : [];
@@ -301,7 +312,7 @@ function openModal(tid, current, onSave) {
           <div class="gsrn-color-presets">
              <div class="gsrn-presets-label">Preset:</div>
              <div class="gsrn-presets-list">
-               ${predesignedColors.map(c => `<div class="gsrn-color-swatch" style="background:${c}" data-color="${c}"></div>`).join('')}
+               ${predesignedColors.map(c => `<button type="button" class="gsrn-color-swatch" style="background:${c}" data-color="${c}" aria-label="Use color ${c}"></button>`).join('')}
              </div>
           </div>
           <div id="gsrn-recent-colors" class="gsrn-color-presets gsrn-recent">
@@ -408,7 +419,7 @@ function openModal(tid, current, onSave) {
   // Recent colors
   safeGet(RECENT_COLORS_KEY, (res) => {
     const recent = res[RECENT_COLORS_KEY] || [];
-    recentList.innerHTML = recent.map(c => `<div class="gsrn-color-swatch" style="background:${c}" data-color="${c}"></div>`).join('');
+    recentList.innerHTML = recent.map(c => `<button type="button" class="gsrn-color-swatch" style="background:${c}" data-color="${c}" aria-label="Use color ${c}"></button>`).join('');
     recentList.querySelectorAll('.gsrn-color-swatch').forEach(sw => {
       sw.addEventListener('click', () => setFromHex(sw.dataset.color));
     });
@@ -420,7 +431,7 @@ function openModal(tid, current, onSave) {
 
   overlay.querySelector('#gsrn-cancel').addEventListener('click', closeModal);
   overlay.querySelector('#gsrn-reset').addEventListener('click', () =>
-    deleteRename(tid, () => { onSave(null); closeModal(); }));
+    deleteRename(tid, () => { if (extensionEnabled) onSave(null); closeModal(); }));
   
   overlay.querySelector('#gsrn-save').addEventListener('click', () => {
     const textVal = input.value.trim();
@@ -437,13 +448,22 @@ function openModal(tid, current, onSave) {
     }
 
     saveRename(tid, textVal, finalColor, services, currentFontWeight, currentFontStyle, () => {
-      onSave({ text: textVal, color: finalColor, services, fontWeight: currentFontWeight, fontStyle: currentFontStyle });
+      if (extensionEnabled) onSave({ text: textVal, color: finalColor, services, fontWeight: currentFontWeight, fontStyle: currentFontStyle });
       closeModal();
     });
   });
 
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
   overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      const focusable = Array.from(overlay.querySelectorAll('button, input')).filter(element =>
+        !element.disabled && !element.closest('.gsrn-disabled')
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
     if (e.key === 'Escape') closeModal();
     if (e.key === 'Enter' && document.activeElement === input)
       overlay.querySelector('#gsrn-save').click();
@@ -456,7 +476,7 @@ function openModal(tid, current, onSave) {
 function makeBtn(tid, getEntry, onSave) {
   const btn = document.createElement('button');
   btn.className = 'gsrn-rename-btn';
-  btn.textContent = '✏️';
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z"/><path d="m14 5 5 5"/></svg>';
   btn.title = 'Rename subject (local only)';
   btn.setAttribute('aria-label', 'Rename email subject locally');
   btn.addEventListener('click', (e) => {
@@ -470,6 +490,7 @@ function makeBtn(tid, getEntry, onSave) {
 /* ─── List view ──────────────────────────────────────────────── */
 
 function processListView(renames) {
+  if (!extensionEnabled) return;
   // 1. Apply / restore renames on all visible subject spans.
   document.querySelectorAll('span.bog > span[data-thread-id]').forEach(span => {
     const tid   = normalizeId(span.getAttribute('data-thread-id'));
@@ -483,6 +504,7 @@ function processListView(renames) {
       if (!span.dataset.gsrnClick) {
         span.dataset.gsrnClick = '1';
         span.addEventListener('click', (e) => {
+          if (!extensionEnabled || !span.hasAttribute(ORIGINAL_ATTR)) return;
           e.stopPropagation();
           e.preventDefault();
           const onSave = (ns) => {
@@ -537,6 +559,7 @@ function processThreadView() {
   if (!h2 || !tid) return;
 
   safeGet(skey(tid), (result) => {
+    if (!extensionEnabled || !h2.isConnected || urlThreadId() !== tid) return;
     const entry = result ? parseValue(result[skey(tid)]) : null;
     if (entry && entry.text) applyText(h2, entry);
     else if (h2.hasAttribute(ORIGINAL_ATTR)) restoreText(h2);
@@ -571,7 +594,7 @@ function processThreadView() {
 /* ─── Main run ───────────────────────────────────────────────── */
 
 function run() {
-  if (!isAlive()) return;
+  if (!isAlive() || !extensionEnabled) return;
   const inThread = !!document.querySelector('h2.hP') && !!urlThreadId();
   if (inThread) {
     processThreadView();
@@ -614,4 +637,23 @@ const observer = new MutationObserver((mutations) => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-scheduleRun();
+function setEnabled(value) {
+  extensionEnabled = value !== false;
+  if (extensionEnabled) {
+    observer.observe(document.body, { childList: true, subtree: true });
+    scheduleRun();
+  } else {
+    observer.disconnect();
+    closeModal();
+    document.querySelectorAll(`[${ORIGINAL_ATTR}]`).forEach(restoreText);
+    document.querySelectorAll('.gsrn-rename-btn').forEach(button => button.remove());
+  }
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (!isAlive() || area !== 'local') return;
+  if (changes[ENABLED_KEY]) setEnabled(changes[ENABLED_KEY].newValue);
+  else if (extensionEnabled) scheduleRun();
+});
+
+safeGet(ENABLED_KEY, result => setEnabled(result[ENABLED_KEY]));
